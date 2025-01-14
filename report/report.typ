@@ -10,7 +10,10 @@
 )
 
 = Introduction
-TODO
+Les widgets sont des composants essentiels de l'écosystème Android, permettant aux utilisateurs d'accéder rapidement à des informations ou des fonctionnalités sans ouvrir l'application complète. Ce projet explore la création d'un widget Android moderne en utilisant les dernières technologies recommandées par Google, notamment Jetpack Compose et Jetpack Glance.
+
+L'objectif est de créer un widget responsive et interactif, en suivant les bonnes pratiques de développement Android. Nous verrons comment configurer, implémenter et personnaliser un widget pour offrir une expérience utilisateur optimale.
+
 == Conception
 === Architecture
 L'architecture du widget se compose de plusieurs éléments essentiels:
@@ -49,7 +52,7 @@ La configuration d'un widget se fait principalement via un fichier XML qui défi
 - description: Description du widget affichée dans le sélecteur de widgets.
 
 // TODO crop
-@widget-example The following shows the defined widget with a target size of 3x1 cells and its description.
+@widget-example
 #figure(
   image("widget-example.png", width: 20%),
   caption: [
@@ -70,6 +73,7 @@ La configuration d'un widget se fait principalement via un fichier XML qui défi
     Example of a large widget (resized)
   ]
 ) <widget-large>
+
 === Manifest
 Comme pour une activité, il est nécessaire de déclarer le widget dans le fichier `AndroidManifest.xml`:
 ```xml
@@ -97,6 +101,44 @@ Il est possible d'utiliser Jetpack Compose et Jetpack Glance pour créer des wid
 === Classe principale du widget
 L'implémentation du widget nécessite une classe héritant de `GlanceAppWidgetReceiver` qui permet de gérer les événements du widget et de `GlanceAppWidget` qui permet de définir le layout du widget.
 
+=== Layout du widget
+Il est possible d'afficher ou non certains éléments selon la taille du widget, si l'on décide de rendre le widget "responsive". Par exemple, on peut afficher un seul bouton si le widget est petit et plusieurs boutons si le widget est plus grand.
 
+On définit des tailles possibles du widget dans la classe principale du widget:
+```kotlin
+ companion object {
+        private val SMALL_SQUARE = DpSize(100.dp, 100.dp)
+        private val HORIZONTAL_RECTANGLE = DpSize(150.dp, 100.dp)
+        private val BIG_SQUARE = DpSize(250.dp, 250.dp)
+    }
+
+    override val sizeMode = SizeMode.Responsive(
+        setOf(
+            SMALL_SQUARE, HORIZONTAL_RECTANGLE, BIG_SQUARE
+        )
+    )
+```
+
+Ensuite, on peut décidé d'afficher ou non certains éléments en fonction de la taille du widget:
+```kotlin
+@Composable
+    override fun Content() {
+        Column {
+            if (size == SMALL_SQUARE) {
+                Text("Small widget")
+            } else {
+                Text("Big widget")
+            }
+        }
+    }
+```
 = Conclusion
-TODO
+Ce projet nous a permis d'explorer en profondeur le développement de widgets Android modernes. L'utilisation de Jetpack Glance, combinée à Jetpack Compose, offre une approche déclarative et intuitive pour créer des widgets interactifs et responsives.
+
+Les principaux apprentissages incluent:
+- La configuration et la déclaration correcte d'un widget dans le système Android
+- L'utilisation des nouvelles APIs de Jetpack Glance pour une approche moderne du développement
+- La gestion du responsive design pour s'adapter aux différentes tailles d'affichage
+- L'implémentation d'interactions utilisateur fluides et efficaces
+
+Cette expérience démontre l'évolution des outils de développement Android, rendant la création de widgets plus accessible tout en maintenant un haut niveau de personnalisation et de performance.
