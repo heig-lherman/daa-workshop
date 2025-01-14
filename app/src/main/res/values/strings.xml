@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">template</string>
-    <string name="welcome">Welcome to DAA!</string>
+    <string name="app_name">WidgetApp</string>
+    <string name="widget_picker_description">Just a simple widget</string>
 </resources>

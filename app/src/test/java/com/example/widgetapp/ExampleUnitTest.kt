@@ -1,4 +1,4 @@
-package ch.heigvd.iict.daa.template
+package com.example.widgetapp
 
 import org.junit.Test
 
