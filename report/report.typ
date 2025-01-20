@@ -51,28 +51,30 @@ La configuration d'un widget se fait principalement via un fichier XML qui défi
 - resizeMode: Mode de redimensionnement du widget. Il faut le définir pour permettre à l'utilisateur de redimensionner le widget.
 - description: Description du widget affichée dans le sélecteur de widgets.
 
-// TODO crop
-@widget-example
-#figure(
-  image("widget-example.png", width: 20%),
-  caption: [
-    Example of a widget configuration
+#align(center)[
+#grid(
+  columns: (25%, 25%, 25%),
+  gutter: 5%,
+  [
+    #figure(
+      image("widget-example.png", width: 100%),
+      caption: [Example of a widget configuration]
+    ) <widget-example>
+  ],
+  [
+    #figure(
+      image("widget-small.png", width: 100%),
+      caption: [Example of a small widget]
+    ) <widget-small>
+  ],
+  [
+    #figure(
+      image("widget-large.png", width: 100%),
+      caption: [Example of a large widget (resized)]
+    ) <widget-large>
   ]
-) <widget-example>
-
-#figure(
-  image("widget-small.png", width: 20%),
-  caption: [
-    Example of a small widget
-  ]
-) <widget-small>  
-
-#figure(
-  image("widget-large.png", width: 20%),
-  caption: [
-    Example of a large widget (resized)
-  ]
-) <widget-large>
+)
+]
 
 === Manifest
 Comme pour une activité, il est nécessaire de déclarer le widget dans le fichier `AndroidManifest.xml`:
@@ -119,19 +121,26 @@ On définit des tailles possibles du widget dans la classe principale du widget:
     )
 ```
 
-Ensuite, on peut décidé d'afficher ou non certains éléments en fonction de la taille du widget:
+Ensuite, on peut décider d'afficher ou non certains éléments en fonction de la taille du widget:
 ```kotlin
 @Composable
-    override fun Content() {
-        Column {
-            if (size == SMALL_SQUARE) {
-                Text("Small widget")
-            } else {
-                Text("Big widget")
-            }
+override fun Content() {
+    Column {
+        if (size == SMALL_SQUARE) {
+            Text("Small widget")
+        } else {
+            Text("Big widget")
         }
     }
+}
 ```
+
+== Limitations des widgets Android
+
+Les widgets Android, bien que souvent décrits comme des "mini-applications", sont soumis à des contraintes spécifiques qui impactent leur conception et leur fonctionnement. La principale limitation concerne les gestes tactiles disponibles : seuls les touches simples et les slides verticaux sont supportés. Cette restriction est due à la nécessité de coexistence harmonieuse avec la navigation native de l'écran d'accueil, où les glissements horizontaux sont déjà réservés pour le défilement entre les pages.
+
+Ces contraintes gestuelles ont des répercussions directes sur les éléments d'interface utilisateur pouvant être intégrés dans un widget. Certains composants UI standards, qui dépendent de gestes plus complexes, ne sont pas disponibles pour les widgets. Il est donc essentiel de prendre en compte ces limitations lors de la conception de widgets pour garantir une expérience utilisateur cohérente avec les directives de la plateforme Android.
+
 = Conclusion
 Ce projet nous a permis d'explorer en profondeur le développement de widgets Android modernes. L'utilisation de Jetpack Glance, combinée à Jetpack Compose, offre une approche déclarative et intuitive pour créer des widgets interactifs et responsives.
 
@@ -142,3 +151,11 @@ Les principaux apprentissages incluent:
 - L'implémentation d'interactions utilisateur fluides et efficaces
 
 Cette expérience démontre l'évolution des outils de développement Android, rendant la création de widgets plus accessible tout en maintenant un haut niveau de personnalisation et de performance.
+
+#bibliography(
+  "report.bib",
+  style: "ieee",
+  full: true
+)
+
+Ce rapport a bénéficié de l'assistance d'intelligences artificielles génératives pour l'amélioration stylistique, la vérification orthographique et la structuration du contenu. Ces outils ont été utilisés comme support à la rédaction tout en préservant l'intégrité du contenu technique et des analyses originales.
