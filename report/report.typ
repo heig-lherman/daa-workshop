@@ -49,6 +49,7 @@ La configuration d'un widget se fait principalement via un fichier XML qui défi
 - minHeight et minWidth: Taille minimale du widget.
 - minResizeHeight et minResizeWidth: Taille minimale du widget après redimensionnement.
 - resizeMode: Mode de redimensionnement du widget. Il faut le définir pour permettre à l'utilisateur de redimensionner le widget.
+  - il est possible de rendre le widget redimensionnable uniquement horizontalement ou verticalement ou les deux en utilisant `horizontal` ou `vertical`.
 - description: Description du widget affichée dans le sélecteur de widgets.
 
 #align(center)[
@@ -95,15 +96,60 @@ Comme pour une activité, il est nécessaire de déclarer le widget dans le fich
 ```
 - android:name: Nom de la classe qui gère le widget
 
+== Approches de développement
+=== Comparaison entre XML et Glance
+Dans ce rapport, nous nous concentrons sur l'implémentation moderne des widgets Android avec Jetpack Glance. Cependant, il est important de noter qu'il existe une approche plus traditionnelle utilisant XML. Voici quelques différences notables entre les deux approches:
+
+==== Approche traditionnelle (XML)
+- Utilisation de fichiers XML pour définir le layout
+- AppWidgetProvider pour la définition du comportement du widget
+- Possibilité de créer une `preview` dans la page d'ajout de widget à partir d'un layout
+- Possibilité de linker un layout à une taille spécifique en utilisant la classe `RemoteViews`
+
+==== Approche Glance
+- Syntaxe déclarative similaire à Jetpack Compose
+- Utilisation de GlanceAppWidgetReceiver pour la gestion du widget
+- Possibilité de créer une `preview` à partir d'une image seulement
+- Afin de pouvoir lier un layout à une taille spécifique, il faudra impérativement utiliser un layout XML, similaire à l'approche traditionnelle (classes `AndroidRemoteViews` et `RemoteViews`)
+
 == Utilisation avec Jetpack Compose et Jetpack Glance
 Il est possible d'utiliser Jetpack Compose et Jetpack Glance pour créer des widgets. Pour cela, il faut ajouter différentes dépendances pour utiliser Android Glance.
 
 
+```bash	
+dependencies {
+
+    // For AppWidgets support
+    implementation(libs.androidx.glance.appwidget)
+
+    // For interop APIs with Material 3
+    implementation(libs.androidx.glance.material3)
+
+    // For interop APIs with Material 2
+    implementation(libs.androidx.glance.material)
+    (...)
+}
+```
+Les 2 dernières ne sont pas obligatoires, mais elles permettent d'utiliser les composants Material 2 et Material 3 dans le widget.
 
 === Classe principale du widget
 L'implémentation du widget nécessite une classe héritant de `GlanceAppWidgetReceiver` qui permet de gérer les événements du widget et de `GlanceAppWidget` qui permet de définir le layout du widget.
 
 === Layout du widget
+==== SizeMode
+Il existe trois modes de gestion de la taille des widgets:
+
+===== SizeMode.Single
+
+Mode par défaut qui indique qu'un seul type de contenu est fourni. Même si la taille disponible du widget change, le contenu ne s'adapte pas. 
+
+===== SizeMode.Responsive
+Permet de définir un ensemble de mises en page réactives limitées par des tailles spécifiques. Pour chaque taille définie, le contenu est créé et mappé lors de la création ou de la mise à jour du widget. Le système sélectionne ensuite la meilleure correspondance en fonction de la taille disponible.
+
+
+===== SizeMode.Exact
+Ce mode demande le contenu du widget chaque fois que la taille disponible change (par exemple, lorsque l'utilisateur redimensionne le widget sur l'écran d'accueil). Il offre la plus grande flexibilité mais peut être plus coûteux en performances.
+
 Il est possible d'afficher ou non certains éléments selon la taille du widget, si l'on décide de rendre le widget "responsive". Par exemple, on peut afficher un seul bouton si le widget est petit et plusieurs boutons si le widget est plus grand.
 
 On définit des tailles possibles du widget dans la classe principale du widget:
@@ -121,19 +167,26 @@ On définit des tailles possibles du widget dans la classe principale du widget:
     )
 ```
 
-Ensuite, on peut décider d'afficher ou non certains éléments en fonction de la taille du widget:
+Ensuite, on peut décider d'afficher ou non certains éléments en fonction de la taille du widget. Cela permet d'optimiser l'espace disponible et de "render" le widget parfaitement pour chaque taille.
+
 ```kotlin
 @Composable
 override fun Content() {
-    Column {
-        if (size == SMALL_SQUARE) {
-            Text("Small widget")
-        } else {
-            Text("Big widget")
-        }
-    }
+  Button(
+    text = "Home",
+    onClick = actionStartActivity<MainActivity>()
+  )
+  if (size.width >= HORIZONTAL_RECTANGLE.width) {
+      Spacer(modifier = GlanceModifier.width(8.dp))
+      Button(
+          text = "Work",
+          onClick = actionStartActivity<MainActivity>()
+      )
+  }
 }
 ```
+Ici, on affiche un bouton "Home" par défaut. Le bouton "Work" est affiché seulement si la largeur du widget est supérieure à la largeur définie.
+
 
 == Limitations des widgets Android
 
@@ -158,4 +211,4 @@ Cette expérience démontre l'évolution des outils de développement Android, r
   full: true
 )
 
-Ce rapport a bénéficié de l'assistance d'intelligences artificielles génératives pour l'amélioration stylistique, la vérification orthographique et la structuration du contenu. Ces outils ont été utilisés comme support à la rédaction tout en préservant l'intégrité du contenu technique et des analyses originales.
+Ce rapport a bénéficié de l'assistance d'intelligences artificielles génératives pour l'amélioration stylistique, la vérification orthographique et la structuration du contenu. Ces outils ont été utilisés comme support à la rédaction tout en préservant l'intégrité du contenu technique et des analyses originales. Le code en exemple reprend des extraits de documentation officielle et a été adapté pour illustrer les concepts abordés dans ce rapport.
