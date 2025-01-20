@@ -153,7 +153,9 @@ Ce mode demande le contenu du widget chaque fois que la taille disponible change
 Il est possible d'afficher ou non certains éléments selon la taille du widget, si l'on décide de rendre le widget "responsive". Par exemple, on peut afficher un seul bouton si le widget est petit et plusieurs boutons si le widget est plus grand.
 
 #pagebreak()
-On définit des tailles possibles du widget dans la classe principale du widget:
+===== Exemple avec SizeMode.Responsive
+Voici un exemple de définition de tailles possibles pour un widget, à définir dans la classe principale du widget:
+
 ```kotlin
  companion object {
         private val SMALL_SQUARE = DpSize(100.dp, 100.dp)
