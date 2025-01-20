@@ -216,9 +216,6 @@ fun ContenuWidget() {
            text = "Dashboard",
            onClick = actionStartActivity<DashboardActivity>()
        )
-       
-
-
        // Démarrage d'un service
        Image(
            provider = ImageProvider(R.drawable.sync),
@@ -227,12 +224,11 @@ fun ContenuWidget() {
            ),
            contentDescription = "Synchroniser"
        )
-       
        // Action personnalisée via callback
        Text(
            text = "Rafraîchir",
            modifier = GlanceModifier.clickable(
-               actionRunCallback<ActionRafraichissement>()
+               actionRunCallback<RefreshAction>()
            )
        )
    }
@@ -244,11 +240,11 @@ fun ContenuWidget() {
 Les actions peuvent être enrichies avec des paramètres via l'API `ActionParameters` :
 
 ```kotlin
-private val cleNavigation = ActionParameters.Key<String>("destination")
+private val navigationKey = ActionParameters.Key<String>("destination")
 
 // Utilisation dans une action
 actionStartActivity<NavigationActivity>(
-    actionParametersOf(cleNavigation to "accueil")
+    actionParametersOf(navigationKey to "home")
 )
 ```
 
@@ -262,7 +258,6 @@ Les widgets Android, bien que souvent décrits comme des "mini-applications", so
 
 Ces contraintes gestuelles ont des répercussions directes sur les éléments d'interface utilisateur pouvant être intégrés dans un widget. Certains composants UI standards, qui dépendent de gestes plus complexes, ne sont pas disponibles pour les widgets. Il est donc essentiel de prendre en compte ces limitations lors de la conception de widgets pour garantir une expérience utilisateur cohérente avec les directives de la plateforme Android.
 
-#pagebreak()
 = Conclusion
 Ce projet nous a permis d'explorer en profondeur le développement de widgets Android modernes. L'utilisation de Jetpack Glance, combinée à Jetpack Compose, offre une approche déclarative et intuitive pour créer des widgets interactifs et responsives.
 
