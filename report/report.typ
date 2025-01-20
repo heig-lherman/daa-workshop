@@ -1,6 +1,6 @@
 #import "template.typ": *
 #show: project.with(
-  title: "DAA - Projet Widget",
+  title: "DAA -- Étude de cas\nApp Widgets",
   authors: (
     "Émilie Bressoud",
     "Sacha Butty",
@@ -26,8 +26,7 @@ L'architecture du widget se compose de plusieurs éléments essentiels:
 == Configuration du widget
 La configuration d'un widget se fait principalement via un fichier XML qui définit:
 - Les dimensions du widget
-- Les options de configuration
-- Les options de redimensionnement
+- Les options de configuration et redimensionnement
 
 ```xml	
 <!-- app/src/main/res/xml/my_app_widget_info.xml -->
@@ -45,12 +44,12 @@ La configuration d'un widget se fait principalement via un fichier XML qui défi
         android:description="@string/widget_picker_description">
 </appwidget-provider>
 ```
-- tagetCellWidth et targetCellHeight: Taille du widget en nombre de cellules. Elle permet de définir la taille du widget par défaut en fonction de la grille de l'écran d'accueil.
-- minHeight et minWidth: Taille minimale du widget.
-- minResizeHeight et minResizeWidth: Taille minimale du widget après redimensionnement.
-- resizeMode: Mode de redimensionnement du widget. Il faut le définir pour permettre à l'utilisateur de redimensionner le widget.
+- `tagetCellWidth` et `targetCellHeight`: Taille du widget en nombre de cellules. Elle permet de définir la taille du widget par défaut en fonction de la grille de l'écran d'accueil.
+- `minHeight` et `minWidth`: Taille minimale du widget.
+- `minResizeHeight` et `minResizeWidth`: Taille minimale du widget après redimensionnement.
+- `resizeMode`: Mode de redimensionnement du widget. Il faut le définir pour permettre à l'utilisateur de redimensionner le widget.
   - il est possible de rendre le widget redimensionnable uniquement horizontalement ou verticalement ou les deux en utilisant `horizontal` ou `vertical`.
-- description: Description du widget affichée dans le sélecteur de widgets.
+- `description`: Description du widget affichée dans le sélecteur de widgets.
 
 #align(center)[
 #grid(
@@ -94,7 +93,7 @@ Comme pour une activité, il est nécessaire de déclarer le widget dans le fich
           android:resource="@xml/my_app_widget_info" />
 </receiver>
 ```
-- android:name: Nom de la classe qui gère le widget
+- `android:name`: Nom de la classe qui gère le widget
 
 == Approches de développement
 === Comparaison entre XML et Glance
@@ -106,6 +105,7 @@ Dans ce rapport, nous nous concentrons sur l'implémentation moderne des widgets
 - Possibilité de créer une `preview` dans la page d'ajout de widget à partir d'un layout
 - Possibilité de linker un layout à une taille spécifique en utilisant la classe `RemoteViews`
 
+#pagebreak()
 ==== Approche Glance
 - Syntaxe déclarative similaire à Jetpack Compose
 - Utilisation de GlanceAppWidgetReceiver pour la gestion du widget
@@ -152,6 +152,7 @@ Ce mode demande le contenu du widget chaque fois que la taille disponible change
 
 Il est possible d'afficher ou non certains éléments selon la taille du widget, si l'on décide de rendre le widget "responsive". Par exemple, on peut afficher un seul bouton si le widget est petit et plusieurs boutons si le widget est plus grand.
 
+#pagebreak()
 On définit des tailles possibles du widget dans la classe principale du widget:
 ```kotlin
  companion object {
@@ -187,6 +188,71 @@ override fun Content() {
 ```
 Ici, on affiche un bouton "Home" par défaut. Le bouton "Work" est affiché seulement si la largeur du widget est supérieure à la largeur définie.
 
+== Actions et interactions avec les widgets
+
+Les widgets Android via Jetpack Glance offrent plusieurs mécanismes pour répondre aux interactions utilisateur.
+
+==== Types d'actions disponibles
+
+Le framework propose quatre types d'actions principales qui peuvent être attachées aux composants interactifs :
+
+- `actionStartActivity` : Lance une activité spécifique
+- `actionStartService` : Démarre un service en arrière-plan
+- `actionSendBroadcast` : Émet un message broadcast
+- `actionRunCallback` : Exécute une action personnalisée
+
+Chacune de ces actions peut être déclenchée via le modificateur `GlanceModifier.clickable()` ou le paramètre `onClick` des composants interactifs.
+
+==== Exemples d'implémentation
+
+```kotlin
+@Composable
+fun ContenuWidget() {
+   Column {
+       // Lancement d'activité
+       Button(
+           text = "Dashboard",
+           onClick = actionStartActivity<DashboardActivity>()
+       )
+       
+
+
+       // Démarrage d'un service
+       Image(
+           provider = ImageProvider(R.drawable.sync),
+           modifier = GlanceModifier.clickable(
+               actionStartService<ServiceSync>(isForegroundService = true)
+           ),
+           contentDescription = "Synchroniser"
+       )
+       
+       // Action personnalisée via callback
+       Text(
+           text = "Rafraîchir",
+           modifier = GlanceModifier.clickable(
+               actionRunCallback<ActionRafraichissement>()
+           )
+       )
+   }
+}
+```
+
+==== Paramètres d'actions
+
+Les actions peuvent être enrichies avec des paramètres via l'API `ActionParameters` :
+
+```kotlin
+private val cleNavigation = ActionParameters.Key<String>("destination")
+
+// Utilisation dans une action
+actionStartActivity<NavigationActivity>(
+    actionParametersOf(cleNavigation to "accueil")
+)
+```
+
+Sur Android 12 et les versions ultérieures, le lancement d'activités depuis des lambdas exécutées dans un service est restreint. L'utilisation de `actionStartActivity` pour ces cas d'usage est recommandée.
+
+Il est important de noter que les actions longues ou consommatrices de ressources devraient être déléguées à un `Worker` pour garantir une exécution fiable.
 
 == Limitations des widgets Android
 
@@ -194,6 +260,7 @@ Les widgets Android, bien que souvent décrits comme des "mini-applications", so
 
 Ces contraintes gestuelles ont des répercussions directes sur les éléments d'interface utilisateur pouvant être intégrés dans un widget. Certains composants UI standards, qui dépendent de gestes plus complexes, ne sont pas disponibles pour les widgets. Il est donc essentiel de prendre en compte ces limitations lors de la conception de widgets pour garantir une expérience utilisateur cohérente avec les directives de la plateforme Android.
 
+#pagebreak()
 = Conclusion
 Ce projet nous a permis d'explorer en profondeur le développement de widgets Android modernes. L'utilisation de Jetpack Glance, combinée à Jetpack Compose, offre une approche déclarative et intuitive pour créer des widgets interactifs et responsives.
 
