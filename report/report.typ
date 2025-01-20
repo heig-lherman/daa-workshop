@@ -170,7 +170,7 @@ Voici un exemple de définition de tailles possibles pour un widget, à définir
     )
 ```
 
-Ensuite, on peut décider d'afficher ou non certains éléments en fonction de la taille du widget. Cela permet d'optimiser l'espace disponible et de "render" le widget parfaitement pour chaque taille.
+Ensuite, on peut décider d'afficher ou non certains éléments en fonction de la taille du widget. Cela permet d'optimiser l'espace disponible et de "render" le widget parfaitement pour les différentes tailles.
 
 ```kotlin
 @Composable
